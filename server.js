@@ -27,14 +27,17 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.get('/healthcheck', (req, res) => res.json({message: 'success'}));
 app.get('/', function(req, res){
-    res.send('Hello Express');
+    res.json({message: 'success'});
 });
+
 var itemRouter = require('./app/routes/itemRoutes');
+var categoryRouter = require('./app/routes/categoryRoutes');
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
-app.use('/items', itemRouter);
+app.use('/item', itemRouter);
+app.use('/category', categoryRouter);
 
 // Setup server port
 var port = process.env.PORT || 3000;

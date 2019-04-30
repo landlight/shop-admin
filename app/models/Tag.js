@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var Item = new Schema({
+var Tag = new Schema({
     name: {
         type: String
     },
@@ -15,15 +15,9 @@ var Item = new Schema({
     updated_at: {
         type: Date,
         default: Date.now
-    },
-    categories: [
-        {
-            type: Schema.Types.ObjectId, 
-            ref: 'categories'
-        }
-    ]
+    }
 }, {
-    collection: 'items'
+    collection: 'tags'
 });
 
-module.exports = mongoose.model('items', Item);
+module.exports = mongoose.model('tags', Tag);

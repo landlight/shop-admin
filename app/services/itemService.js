@@ -1,18 +1,20 @@
 var json_error = require('../services/json_error');
 
 const checkAddRequest = (req, res) => {
-    if (!req.body.name){
-        return res.json(json_error.NotFound('name'))
-    }
-    if (!req.body.name){
-        return res.json(json_error.NotFound('name'))
-    }
-    if (!req.body.name){
-        return res.json(json_error.NotFound('name'))
-    }
-    if (!req.body.name){
-        return res.json(json_error.NotFound('name'))
-    }
+    return new Promise(function(resolve, reject) {
+    	// Do async job
+        if (!req.body.name){
+            reject(json_error.NotFound('name'))
+        }else if (!req.body.description){
+            reject(json_error.NotFound('description'))
+        }else if (!req.body.price){
+            reject(json_error.NotFound('price'))
+        }else if (!req.body.priceType){
+            reject(json_error.NotFound('priceType'))
+        }else {
+            resolve(req.body);
+        }
+    })
 }
 
 

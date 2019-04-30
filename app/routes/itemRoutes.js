@@ -3,19 +3,17 @@ var itemController = require('../controllers/itemController')
 var express = require('express');
 var itemRouter = express.Router();
 
-itemRouter.route('/').get(function (req, res) {
-    res.render('items');
-});
+itemRouter.route('/')
+    .post(itemController.add);
 
-itemRouter.route('/single').get(function (req, res) {
-    res.render('singleItem');
-});
+itemRouter.route('/')
+    .get(itemController.get);
+
+itemRouter.route('/search')
+    .get(itemController.search);
 
 itemRouter.route('/addItem').get(function (req, res) {
     res.render('addItem');
 });
-
-itemRouter.route('/add')
-    .post(itemController.add);
 
 module.exports = itemRouter;

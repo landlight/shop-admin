@@ -1,24 +1,22 @@
-var Item = require('../models/Item');
-var ItemService = require('../services/itemService');
+var Category = require('../models/Category');
 var paging = require('../services/paging');
 var json_error = require('../services/json_error');
 
 const add = async (req, res, next) => {
-    let addRequestPromise= ItemService.checkAddRequest(req, res);
-    addRequestPromise.then(function(reqItem) {
-        console.log(reqItem);
-        var item = new Item(reqItem);
-        console.log(item, "item");
-        item.save()
-            .then(item => {
-                res.json(item);
+    if (!req.body.name){
+        return res.status(400).json(json_error.NotFound('name'));
+    }
+    if (!req.body.description){
+        return res.status(400).json(json_error.NotFound('description'));
+    }
+    var category = new Category(req.body);
+        category.save()
+            .then(category => {
+                res.json(category);
             })
             .catch(err => {
                 res.status(400).send("unable to save to database");
             });
-    }, function(err){
-        return res.status(err.code).json({error: err.error});
-    });
 }
 
 const get = async (req, res, next) => {
@@ -41,12 +39,12 @@ const search = async (req, res) => {
     }
     let keyword = `.*${req.query.keyword}.*`;
     Item.find({$or: [{
-                        "name": {
+                        "display_name": {
                             '$regex': keyword
                         }
                     },
                     {
-                        "description": {
+                        "email": {
                             '$regex': keyword
                         }
                     }
