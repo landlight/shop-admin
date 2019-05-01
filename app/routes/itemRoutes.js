@@ -12,8 +12,4 @@ itemRouter.route('/')
 itemRouter.route('/search')
     .get(itemController.search);
 
-itemRouter.route('/addItem').get(function (req, res) {
-    res.render('addItem');
-});
-
 module.exports = itemRouter;

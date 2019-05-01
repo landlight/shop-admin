@@ -1,6 +1,6 @@
-var Category = require('../models/Category');
-var paging = require('../services/paging');
-var json_error = require('../services/json_error');
+var Category = require('../models/Category'),
+    paging = require('../services/paging'),
+    json_error = require('../services/json_error');
 
 const add = async (req, res, next) => {
     if (!req.body.name){
@@ -21,12 +21,13 @@ const add = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     let {pageSize} = paging.getPageSize(req);
-    Item.find({})
-         .limit(pageSize)
-         .exec(function (err, results) {
-            if (err) return next(err);
-            return res.json(paging.pageResponse(pageSize,results));
-         });
+    Category.find({})
+            .populate('parent_id')
+            .limit(pageSize)
+            .exec(function (err, results) {
+                if(err) return next(err);
+                return res.json(paging.pageResponse(pageSize,results));
+            });
 }
 
 const search = async (req, res) => {

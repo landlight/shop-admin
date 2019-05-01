@@ -24,10 +24,9 @@
   "homepage": "https://github.com/landlight/shop-admin#readme",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "bootstrap": "^4.3.1",
+    "camelcase-keys": "^5.2.0",
     "cors": "^2.8.5",
     "dotenv": "^7.0.0",
-    "ejs": "^2.6.1",
     "express": "^4.16.4",
     "lodash": "^4.17.11",
     "mongodb": "^3.2.3",

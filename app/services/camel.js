@@ -1,6 +1,9 @@
+'use strict';
+
 const _ = require("lodash")
 
 function camelCaseObject(o) {
+    console.log(o, "opem");
     let newO, origKey, value
     if (o instanceof Array) {
         newO = []

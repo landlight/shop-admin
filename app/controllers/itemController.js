@@ -1,7 +1,7 @@
-var Item = require('../models/Item');
-var ItemService = require('../services/itemService');
-var paging = require('../services/paging');
-var json_error = require('../services/json_error');
+var Item = require('../models/Item'),
+    ItemService = require('../services/itemService'),
+    paging = require('../services/paging'),
+    json_error = require('../services/json_error');
 
 const add = async (req, res, next) => {
     let addRequestPromise= ItemService.checkAddRequest(req, res);
@@ -14,7 +14,7 @@ const add = async (req, res, next) => {
                 res.json(item);
             })
             .catch(err => {
-                res.status(400).send("unable to save to database");
+                res.status(400).json({error: err});
             });
     }, function(err){
         return res.status(err.code).json({error: err.error});
@@ -24,11 +24,11 @@ const add = async (req, res, next) => {
 const get = async (req, res, next) => {
     let {pageSize} = paging.getPageSize(req);
     Item.find({})
-         .limit(pageSize)
-         .exec(function (err, results) {
-            if (err) return next(err);
-            return res.json(paging.pageResponse(pageSize,results));
-         });
+        .limit(pageSize)
+        .exec(function (err, results) {
+        if (err) return next(err);
+        return res.json(paging.pageResponse(pageSize, results));
+        });
 }
 
 const search = async (req, res) => {

@@ -30,14 +30,9 @@ app.get('/', function(req, res){
     res.json({message: 'success'});
 });
 
-var itemRouter = require('./app/routes/itemRoutes');
-var categoryRouter = require('./app/routes/categoryRoutes');
+let routes = require('./app/routes/routes');
 
-app.set('view engine', 'ejs');
-app.use(express.static('public'));
-
-app.use('/item', itemRouter);
-app.use('/category', categoryRouter);
+app.use('/', routes);
 
 // Setup server port
 var port = process.env.PORT || 3000;

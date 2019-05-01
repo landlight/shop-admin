@@ -18,12 +18,19 @@ var Item = new Schema({
     },
     categories: [
         {
-            type: Schema.Types.ObjectId, 
+            type: Schema.ObjectId, 
             ref: 'categories'
+        }
+    ],
+    tags: [
+        {
+            type: Schema.ObjectId,
+            ref: 'tags'
         }
     ]
 }, {
     collection: 'items'
 });
+var item = mongoose.model('items', Item);
 
-module.exports = mongoose.model('items', Item);
+module.exports = item;

@@ -5,9 +5,6 @@ var Tag = new Schema({
     name: {
         type: String
     },
-    description: {
-        type: String
-    },
     created_at: {
         type: Date,
         default: Date.now
@@ -15,7 +12,7 @@ var Tag = new Schema({
     updated_at: {
         type: Date,
         default: Date.now
-    }
+    },
 }, {
     collection: 'tags'
 });

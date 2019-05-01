@@ -1,4 +1,4 @@
-var camel_case = require('../services/camel');
+const camelcaseKeys = require('camelcase-keys');
 
 function getPageSize(req){
     let pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : parseInt(process.env.PAGE_SIZE);
@@ -7,14 +7,18 @@ function getPageSize(req){
     };
 }
 
-function pageResponse(pageSize, result, nextPageId) {
+function pageResponse(pageSize, results, nextPageId) {
+    items = []
+    for(let i in results){
+        items.push(results[i].toObject());
+    }
     return {
         pageInformation: {
             size: pageSize,
-            numberOfItems: result.length,
+            numberOfItems: results.length,
             nextPageId
         },
-        entities: camel_case.camelCaseObject(result)
+        entities: camelcaseKeys(items)
     };
 }
 
