@@ -12,4 +12,7 @@ itemRouter.route('/')
 itemRouter.route('/search')
     .get(itemController.search);
 
+itemRouter.route('/getByCategory')
+          .post(itemController.getItemsByCategory);
+
 module.exports = itemRouter;

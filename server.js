@@ -20,10 +20,16 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 // Configure bodyparser to handle post requests
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 app.use(bodyParser.urlencoded({
     extended: true
   }));
-  
+
 app.use(bodyParser.json());
 app.get('/healthcheck', (req, res) => res.json({message: 'success'}));
 app.get('/', function(req, res){

@@ -26,9 +26,26 @@ const get = async (req, res, next) => {
     Item.find({})
         .limit(pageSize)
         .exec(function (err, results) {
-        if (err) return next(err);
-        return res.json(paging.pageResponse(pageSize, results));
+            if (err) return next(err);
+            return res.json(paging.pageResponse(pageSize, results));
         });
+}
+
+const getItemsByCategory = async (req, res, next) => {
+    let {pageSize} = paging.getPageSize(req);
+
+    if (!req.body.categories || req.body.categories.length == 0){
+        return res.status(400).json(json_error.NotFound('categories'));
+    }
+
+    let categories = req.body.categories;
+    
+    Item.find({categories: {$all: categories}})
+        .limit(pageSize)
+        .exec(function (err, results) {
+            if(err) return next(err);
+            return res.json(paging.pageResponse(pageSize, results));
+        })
 }
 
 const search = async (req, res) => {
@@ -66,6 +83,7 @@ const remove = async (req, res) => {
 module.exports = {
     add,
     get,
+    getItemsByCategory,
     search,
-    remove
+    remove,
 }
