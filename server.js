@@ -19,8 +19,8 @@ var db = mongoose.connection;
 //Bind connection to error event (to get notification of connection errors)
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-// Configure bodyparser to handle post requests
-app.use(function(req, res, next) {
+//Configure bodyparser to handle post requests
+app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
@@ -37,8 +37,11 @@ app.get('/', function(req, res){
 });
 
 let routes = require('./app/routes/routes');
+let basepath = '/api/'
 
-app.use('/', routes);
+app.get('/', (req, res) => res.json('Hello World with Shop API'));
+
+app.use(basepath, routes);
 
 // Setup server port
 var port = process.env.PORT || 3000;

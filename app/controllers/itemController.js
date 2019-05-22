@@ -6,9 +6,7 @@ var Item = require('../models/Item'),
 const add = async (req, res, next) => {
     let addRequestPromise= ItemService.checkAddRequest(req, res);
     addRequestPromise.then(function(reqItem) {
-        console.log(reqItem);
         var item = new Item(reqItem);
-        console.log(item, "item");
         item.save()
             .then(item => {
                 res.json(item);
@@ -24,9 +22,12 @@ const add = async (req, res, next) => {
 const get = async (req, res, next) => {
     let {pageSize} = paging.getPageSize(req);
     Item.find({})
+        .populate('categories', 'name')
+        .populate('tags', 'name')
         .limit(pageSize)
         .exec(function (err, results) {
             if (err) return next(err);
+            console.log(results.length, "res");
             return res.json(paging.pageResponse(pageSize, results));
         });
 }

@@ -16,6 +16,12 @@ var Item = new Schema({
         type: Date,
         default: Date.now
     },
+    price:{
+        type: Number
+    },
+    priceType:{
+        type: String
+    },
     categories: [
         {
             type: Schema.ObjectId, 

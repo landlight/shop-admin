@@ -19,7 +19,7 @@ const add = async (req, res, next) => {
 const get = async (req, res, next) => {
     let {pageSize} = paging.getPageSize(req);
     Tag.find({})
-            .populate('parent_id')
+            .populate('parent_id', `name`)
             .limit(pageSize)
             .exec(function (err, results) {
                 if(err) return next(err);
