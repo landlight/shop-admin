@@ -1,0 +1,37 @@
+{
+  "name": "shop-admin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha timeout -10000",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/landlight/shop-admin.git"
+  },
+  "keywords": [
+    "shop-admin",
+    "node.js",
+    "mongodb"
+  ],
+  "author": "chitkhine",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/landlight/shop-admin/issues"
+  },
+  "homepage": "https://github.com/landlight/shop-admin#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "camelcase-keys": "^5.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^7.0.0",
+    "express": "^4.16.4",
+    "lodash": "^4.17.11",
+    "mongodb": "^3.2.3",
+    "mongoose": "^5.5.2",
+    "nodemon": "^1.18.11",
+    "request": "^2.88.0"
+  }
+}
