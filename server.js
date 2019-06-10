@@ -40,7 +40,7 @@ let routes = require('./app/routes/routes');
 let basepath = '/api/'
 
 app.get('/', (req, res) => res.json('Hello World with Shop API'));
-
+app.use('/uploads', express.static('uploads'));
 app.use(basepath, routes);
 
 // Setup server port

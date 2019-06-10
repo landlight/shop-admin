@@ -1,12 +1,16 @@
 var express = require('express');
 var appRouter = express.Router();
 
-let itemRoutes = require('./itemRoutes')
-let categoryRoutes = require('./categoryRoutes')
-let tagRoutes = require('./tagRoutes')
+let itemRoutes = require('./itemRoutes');
+let categoryRoutes = require('./categoryRoutes');
+let tagRoutes = require('./tagRoutes');
+let userRoutes = require('./userRoutes');
+let subCategoryRoutes = require('./subCategoryRoutes');
 
+appRouter.use('/user/', userRoutes);
 appRouter.use('/item', itemRoutes);
 appRouter.use('/category', categoryRoutes);
-appRouter.use('/tags', tagRoutes);
+appRouter.use('/subcategory', subCategoryRoutes);
+appRouter.use('/tag', tagRoutes);
 
 module.exports = appRouter;

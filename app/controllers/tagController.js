@@ -9,7 +9,7 @@ const add = async (req, res, next) => {
     var tag = new Tag(req.body);
          tag.save()
             .then(category => {
-                return res.json(category);
+               return res.json(category);
             })
             .catch(err => {
                 return next(err);

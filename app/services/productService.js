@@ -27,6 +27,9 @@ const checkAddRequest = (req, res) => {
                 }   
             }
             req.body.tags = tags;
+            if (req.file){
+                req.body.productImage = req.file.path;
+            }
             resolve(req.body);
         }
     })

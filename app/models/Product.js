@@ -1,9 +1,10 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var Item = new Schema({
+var Product = new Schema({
     name: {
-        type: String
+        type: String,
+        required: true
     },
     description: {
         type: String
@@ -33,10 +34,14 @@ var Item = new Schema({
             type: Schema.ObjectId,
             ref: 'tags'
         }
-    ]
+    ],
+    productImage: {
+        type: String,
+        required: false,
+    }
 }, {
     collection: 'items'
 });
-var item = mongoose.model('items', Item);
+var proudct = mongoose.model('products', Product);
 
-module.exports = item;
+module.exports = proudct;
