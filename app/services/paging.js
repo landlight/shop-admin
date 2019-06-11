@@ -10,7 +10,11 @@ function getPageSize(req){
 function pageResponse(pageSize, results, nextPageId) {
     items = []
     for(let i in results){
-        items.push(results[i].toObject());
+        let item = results[i].toObject()
+        if (item.password){
+            delete item.password;
+        }
+        items.push(item);
     }
     return {
         pageInformation: {

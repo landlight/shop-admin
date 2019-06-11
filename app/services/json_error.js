@@ -5,6 +5,13 @@ function NotFound(item) {
     }
 }
 
+function Invalidate(){
+    return {
+        code: 401, 
+        error: `username or password is incorrect`
+    }
+}
+
 function NotAuthorized() {
     return {
         code: 401,
@@ -38,5 +45,6 @@ module.exports = {
     NotAuthorized,
     IsNotObject,
     OutOfBound,
-    AtLeast
+    AtLeast,
+    Invalidate
 }

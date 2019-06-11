@@ -1,16 +1,16 @@
-const Product = require('../models/Product');
-const ItemService = require('../services/productService');
+const Item = require('../models/Item');
+const ItemService = require('../services/itemService');
 const paging = require('../services/paging');
 const json_error = require('../services/json_error');
 
 const add = async (req, res, next) => {
     console.log(req.file, "file1");
     let addRequestPromise= ItemService.checkAddRequest(req, res);
-    addRequestPromise.then(function(reqProduct) {
-        var product = new Product(reqProduct);
-        product.save()
-            .then(product => {
-                res.json(product);
+    addRequestPromise.then((reqItem) => {
+        var item = new Item(reqItem);
+        item.save()
+            .then(item => {
+                res.json(paging.pageResponse(item));
             })
             .catch(err => {
                 res.status(400).json({error: err});
@@ -22,7 +22,7 @@ const add = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     let {pageSize} = paging.getPageSize(req);
-    Product.find({})
+    Item.find({})
         .populate('categories', 'name')
         .populate('tags', 'name')
         .limit(pageSize)
@@ -42,7 +42,7 @@ const getItemsByCategory = async (req, res, next) => {
 
     let categories = req.body.categories;
     
-    Product.find({categories: {$all: categories}})
+    Item.find({categories: {$all: categories}})
         .limit(pageSize)
         .exec(function (err, results) {
             if(err) return next(err);
@@ -59,7 +59,7 @@ const search = async (req, res) => {
         return res.status(400).json(json_error.AtLeast('keyword',3));
     }
     let keyword = `.*${req.query.keyword}.*`;
-    Product.find({$or: [{
+    Item.find({$or: [{
                         "name": {
                             '$regex': keyword
                         }

@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var Product = new Schema({
+var Item = new Schema({
     name: {
         type: String,
         required: true
@@ -42,6 +42,6 @@ var Product = new Schema({
 }, {
     collection: 'items'
 });
-var proudct = mongoose.model('products', Product);
 
-module.exports = proudct;
+module.exports = mongoose.model('items', Item);
+
