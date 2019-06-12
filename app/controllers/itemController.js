@@ -22,6 +22,7 @@ const add = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     let {pageSize} = paging.getPageSize(req);
+    console.log(req.user, "loginUser");
     Item.find({})
         .populate('categories', 'name')
         .populate('tags', 'name')

@@ -83,22 +83,34 @@ const login = async (req, res, next) => {
     })
 }
 
-const verify = async (req, res, next) => {
+const verify = async (req, res, next) => { 
     try{
+        if (!req.headers.authorization) {
+            return res.status(401).json(json_error.NotAuthorized());
+        }
         const token = req.headers.authorization.split(" ")[1];
-        console.log(token, "token");
+        console.log("are you heree");
         jwt.verify(token, process.env.SECRET, (err, payload) => {
             if (err) {
                 return res.json(401).json(json_error.NotAuthorized());
             }
+            console.log("where are you now");
             if (payload) {
-                User.findById(payload.user_id).then(
-                    (user) => {
-                        req.user = user;
-                        // use next here as middleware
-                        next(user);
-                    }
-                )
+                BlackList.findOne({token: token}, (err, blacklist) => {
+                    if (err)
+                    return next(err);
+                    if (blacklist){
+                        return res.status(401).json(json_error.NotAuthorized());
+                    } else {
+                        User.findById(payload.user_id, (err, user) => {
+                            if (err)
+                                return next(err);
+                            if (user)
+                                req.user = user;
+                                next();
+                        })
+                    }  
+                })                
             } else {
                 return res.json(401).json(json_error.NotAuthorized());
             }
