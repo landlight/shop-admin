@@ -1,4 +1,4 @@
-function NotFound(item) {
+function IsRequired(item) {
     return {
         code : 400,
         error: `${item} is required`
@@ -41,7 +41,7 @@ function AtLeast(item, length){
 }
 
 module.exports = {
-    NotFound,
+    IsRequired,
     NotAuthorized,
     IsNotObject,
     OutOfBound,

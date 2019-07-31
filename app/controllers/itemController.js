@@ -38,7 +38,7 @@ const getItemsByCategory = async (req, res, next) => {
     let {pageSize} = paging.getPageSize(req);
 
     if (!req.body.categories || req.body.categories.length == 0){
-        return res.status(400).json(json_error.NotFound('categories'));
+        return res.status(400).json(json_error.IsRequired('categories'));
     }
 
     let categories = req.body.categories;
@@ -54,7 +54,7 @@ const getItemsByCategory = async (req, res, next) => {
 const search = async (req, res) => {
     let {pageSize} = paging.getPageSize(req);
     if (!req.query.keyword){
-        return res.status(400).json(json_error.NotFound('keyword'));
+        return res.status(400).json(json_error.IsRequired('keyword'));
     }
     if (req.query.keyword.length < 3){
         return res.status(400).json(json_error.AtLeast('keyword',3));

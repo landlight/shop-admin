@@ -5,13 +5,13 @@ const checkAddRequest = (req, res) => {
     return new Promise(function(resolve, reject) {
     	// Do async job
         if (!req.body.name){
-            reject(json_error.NotFound('name'))
+            reject(json_error.IsRequired('name'))
         }else if (!req.body.description){
-            reject(json_error.NotFound('description'))
+            reject(json_error.IsRequired('description'))
         }else if (!req.body.price){
-            reject(json_error.NotFound('price'))
+            reject(json_error.IsRequired('price'))
         }else if (!req.body.priceType){
-            reject(json_error.NotFound('priceType'))
+            reject(json_error.IsRequired('priceType'))
         }else {
             let categories = [];
             if (req.body.categories){

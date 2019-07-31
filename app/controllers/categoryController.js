@@ -4,10 +4,10 @@ var Category = require('../models/Category'),
 
 const add = async (req, res, next) => {
     if (!req.body.name){
-        return res.status(400).json(json_error.NotFound('name'));
+        return res.status(400).json(json_error.IsRequired('name'));
     }
     if (!req.body.description){
-        return res.status(400).json(json_error.NotFound('description'));
+        return res.status(400).json(json_error.IsRequired('description'));
     }
     var category = new Category(req.body);
         category.save()
@@ -33,7 +33,7 @@ const get = async (req, res, next) => {
 const search = async (req, res) => {
     let {pageSize} = paging.getPageSize(req);
     if (!req.query.keyword){
-        return res.status(400).json(json_error.NotFound('keyword'));
+        return res.status(400).json(json_error.IsRequired('keyword'));
     }
     if (req.query.keyword.length < 3){
         return res.status(400).json(json_error.AtLeast('keyword',3));

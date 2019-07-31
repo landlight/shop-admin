@@ -4,7 +4,7 @@ var Tag = require('../models/Tag'),
 
 const add = async (req, res, next) => {
     if (!req.body.name){
-        return res.status(400).json(json_error.NotFound('name'));
+        return res.status(400).json(json_error.IsRequired('name'));
     }
     var tag = new Tag(req.body);
          tag.save()

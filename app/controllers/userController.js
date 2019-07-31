@@ -9,10 +9,10 @@ const jwt = require('jsonwebtoken');
 
 const signup = async (req, res, next) => {
     if (!req.body.email){
-        return res.json(json_error.NotFound('email'));
+        return res.json(json_error.IsRequired('email'));
     }
     if (!req.body.password){
-        return res.json(json_error.NotFound('password'));
+        return res.json(json_error.IsRequired('password'));
     }
     if (req.body.role < 1 || req.body.role > 3){
         return res.json(json_error.OutOfBound('role', 0, 3));
@@ -42,10 +42,10 @@ const signup = async (req, res, next) => {
 
 const login = async (req, res, next) => {
     if (!req.body.username){
-        return res.json(json_error.NotFound('username'));
+        return res.json(json_error.IsRequired('username'));
     }
     if (!req.body.password){
-        return res.json(json_error.NotFound('password'));
+        return res.json(json_error.IsRequired('password'));
     }
     User.findOne({
         $or: [
