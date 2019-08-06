@@ -5,6 +5,13 @@ function IsRequired(item) {
     }
 }
 
+function NotFound(item) {
+    return {
+        code : 400,
+        error: `${item} not found`
+    }
+}
+
 function Invalidate(){
     return {
         code: 401, 
@@ -40,8 +47,15 @@ function AtLeast(item, length){
     }
 }
 
+function DefaultError(error, res) {
+    let errMessage = !error.message? error: error.message;
+    return res.status(500).json({message: errMessage});
+}
+
 module.exports = {
     IsRequired,
+    DefaultError,
+    NotFound,
     NotAuthorized,
     IsNotObject,
     OutOfBound,

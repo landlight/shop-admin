@@ -33,7 +33,7 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.get('/healthcheck', (req, res) => res.json({message: 'success'}));
 app.get('/', function(req, res){
-    res.json({message: 'success'});
+    res.json({message: 'Running Shop Admin'});
 });
 
 let routes = require('./app/routes/routes');
@@ -44,7 +44,7 @@ app.use('/uploads', express.static('uploads'));
 app.use(basepath, routes);
 
 // Setup server port
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 3001;
 
 var server = app.listen(port, function () {
     console.log("Running Shop-Admin on port " + port);

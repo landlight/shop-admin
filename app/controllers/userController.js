@@ -89,12 +89,10 @@ const verify = async (req, res, next) => {
             return res.status(401).json(json_error.NotAuthorized());
         }
         const token = req.headers.authorization.split(" ")[1];
-        console.log("are you heree");
         jwt.verify(token, process.env.SECRET, (err, payload) => {
             if (err) {
                 return res.json(401).json(json_error.NotAuthorized());
             }
-            console.log("where are you now");
             if (payload) {
                 BlackList.findOne({token: token}, (err, blacklist) => {
                     if (err)
