@@ -2,11 +2,11 @@ var express = require('express');
 var appRouter = express.Router();
 
 let verify = require('../controllers/auth').verify;
-let itemRoutes = require('./itemRoutes');
-let categoryRoutes = require('./categoryRoutes');
-let tagRoutes = require('./tagRoutes');
-let userRoutes = require('./userRoutes');
-let subCategoryRoutes = require('./subCategoryRoutes');
+let itemRoutes = require('./item');
+let categoryRoutes = require('./category');
+let tagRoutes = require('./tag');
+let userRoutes = require('./user');
+let subCategoryRoutes = require('./subCategory');
 let authRoutes = require('./auth');
 
 appRouter.use('/auth', authRoutes);
