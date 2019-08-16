@@ -1,9 +1,13 @@
 const db = require('../../database');
-const ObjectId = require('mongodb').ObjectID;
 const bcrypt = require('bcrypt');
 const json_error = require('../services/json_error');
 const stamperService = require('../services/stamper');
 const pagingService = require('../services/paging');
+const MobileDetect = require('mobile-detect');
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
+const Cookies = require('cookies');
+const keys = ['keyboard cat'];
 
 const signUp = async (req, res, next) => {
     try {
@@ -45,7 +49,42 @@ const signUp = async (req, res, next) => {
                             }
                             let user = insertedUser.ops[0];
                             delete user.password;
-                            return res.json(pagingService.camelCase(user));
+                            const mobileData = new MobileDetect(req.headers['user-agent']);
+                            let rTokenCollection = db.get().collection('refresh_tokens');
+                            var {refreshToken} = generateRefreshToken(user._id);
+                            let current_time =  new Date();
+                            current_time.setHours(current_time.getHours() + 720);
+                            rTokenCollection.insertOne({
+                                user_id: user._id,
+                                role: user.role,
+                                platform: mobileData.ua,
+                                refresh_token: refreshToken,
+                                created_at: new Date(),
+                                updated_at: new Date(),
+                                expired_at: current_time
+                            }, (err, resultToken) => {
+                                if (err) {
+                                    return next(err);
+                                }
+                                let jwt_token = generateJWT(resultToken.insertedId, user._id, user.roles);
+                                let refresh_item = resultToken.ops[0];
+                                if (jwt_token) {
+                                    var cookies = new Cookies(req, res, { keys: keys })
+                                    cookies.set('jwt-token', jwt_token, { signed: true })
+                                    return res.json(pagingService.camelCase({
+                                        id: refresh_item._id,
+                                        userId: user._id,
+                                        user: user,
+                                        role: user.role,
+                                        token: jwt_token,
+                                        refreshToken: refreshToken, 
+                                        updatedAt: refresh_item.updated_at,
+                                        createdAt: refresh_item.created_at
+                                    }));
+                                }else{
+                                    return res.status(401).json(json_error.Unauthorized());
+                                }
+                            });
                         })
                     }
                 );
@@ -80,7 +119,43 @@ const login = async (req, res, next) => {
                     if (!isMatch) {
                         return res.status(401).json(json_error.NotAuthorized());
                     }
-                    return res.json({message: "success"})
+                    delete user.password;
+                    const mobileData = new MobileDetect(req.headers['user-agent']);
+                    let rTokenCollection = db.get().collection('refresh_tokens');
+                    var {refreshToken} = generateRefreshToken(user._id);
+                    let current_time =  new Date();
+                    current_time.setHours(current_time.getHours() + 720);
+                    rTokenCollection.insertOne({
+                        user_id: user._id,
+                        role: user.role,
+                        platform: mobileData.ua,
+                        refresh_token: refreshToken,
+                        created_at: new Date(),
+                        updated_at: new Date(),
+                        expired_at: current_time
+                    }, (err, resultToken) => {
+                        if (err) {
+                            return next(err);
+                        }
+                        let jwt_token = generateJWT(resultToken.insertedId, user._id, user.roles);
+                        let refresh_item = resultToken.ops[0];
+                        if (jwt_token) {
+                            var cookies = new Cookies(req, res, { keys: keys })
+                            cookies.set('jwt-token', jwt_token, { signed: true })
+                            return res.json(pagingService.camelCase({
+                                id: refresh_item._id,
+                                userId: user._id,
+                                user: user,
+                                role: user.role,
+                                token: jwt_token,
+                                refreshToken: refreshToken, 
+                                updatedAt: refresh_item.updated_at,
+                                createdAt: refresh_item.created_at
+                            }));
+                        }else{
+                            return res.status(401).json(json_error.Unauthorized());
+                        }
+                    });
                 })
             }
         )
@@ -89,12 +164,96 @@ const login = async (req, res, next) => {
     }
 }
 
+const verify = async (req, res, next) => {
+    try {
+        //Request a header with the key of authorization
+        let jwt_token = '';
+        if (!req.headers['authorization']) {
+            var cookies = new Cookies(req, res, { keys: keys })
+            jwt_token = cookies.get('jwt-token', { signed: true })    
+        } else {
+            const bearHeader = req.headers['authorization'];
+            jwt_token = bearHeader.split(' ')[1]; // check header
+        }
+        if (jwt_token == '') {
+            return res.status(401).json(json_error.NotAuthorized());
+        }
+        jwt.verify(jwt_token, process.env.JWT_SECRET, (err, authData) => {
+            if (err) {
+                return res.status(401).json(json_error.NotAuthorized());
+            } else { 
+                req.login_user = authData;
+                next();
+            };
+        });
+    } catch (err) {
+        json_error.DefaultError(err, res);
+    }
+}
+
 const logout = async (req, res, next) => {
-    console.log("logout");
+    try {
+        let jwt_token = '';
+        if (!req.headers['authorization']) {
+            var cookies = new Cookies(req, res, { keys: keys })
+            jwt_token = cookies.get('jwt-token', { signed: true })    
+        }else{
+            const bearHeader = req.headers['authorization'];
+            jwt_token = bearHeader.split(' ')[1]; 
+        }
+        if (jwt_token == '') {
+            return res.status(401).json(json_error.NotAuthorized());
+        }
+        jwt.verify(jwt_token, process.env.JWT_SECRET, (err, authData) => {
+            if (err) {
+                return res.status(401).json(json_error.NotAuthorized());
+            }else{
+                let collection = db.get().collection("refreshtokens")
+                collection.updateOne(
+                    {_id: ObjectId(authData.refresh_token_id)},
+                    {$set: {deleted_at: new Date()}
+                }, (err, updated) => {
+                    if (err)
+                        return next(err);
+                    if (updated.modifiedCount > 0){
+                        var cookies = new Cookies(req, res, { keys: keys })
+                        cookies.set('jwt-token', '', { signed: true })
+                        return res.json({message: "success"});
+                    }else{
+                        return res.status(401).json(json_error.NotAuthorized());
+                    }
+                })
+            }
+        });
+    } catch (err) {
+        json_error.DefaultError(err, res);
+    }
+}
+
+function generateJWT(tokenId, userId, role) {
+    let payload = {
+        refresh_token_id: tokenId,
+        user_id: userId,
+        roles: role
+    }
+    console.log(process.env.TOKEN_LIFE);
+    return jwt.sign(payload
+        , process.env.JWT_SECRET, {
+            algorithm: `${process.env.ALGORITHM}`,
+            expiresIn: `${process.env.TOKEN_LIFE}`
+        });
+}
+
+const generateRefreshToken = (userId) => {
+    var randomString = crypto.randomBytes(2).toString('hex'); // create 4 random string
+    let refreshTokenString = userId + '_'+ new Date() + '_' + randomString;
+    let refreshToken = crypto.createHash('sha256').update(refreshTokenString).digest('base64');
+    return { refreshToken };
 }
 
 module.exports = {
     signUp,
     login,
+    verify,
     logout
 }

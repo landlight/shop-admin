@@ -8,9 +8,11 @@ const add = async (req, res, next) => {
     let addRequestPromise= ItemService.checkAddRequest(req, res);
     addRequestPromise.then((reqItem) => {
         var item = new Item(reqItem);
+        console.log(item);
         item.save()
-            .then(item => {
-                res.json(paging.pageResponse(item));
+            .then(newItem => {
+                console.log(newItem, "where is it struck");
+                res.json(paging.camelCase(newItem));
             })
             .catch(err => {
                 res.status(400).json({error: err});
@@ -22,7 +24,7 @@ const add = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     let {pageSize} = paging.getPageSize(req);
-    console.log(req.user, "loginUser");
+    console.log(req.login_user, "loginUser");
     Item.find({})
         .populate('categories', 'name')
         .populate('tags', 'name')
