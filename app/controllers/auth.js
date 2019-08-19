@@ -25,14 +25,16 @@ const signUp = async (req, res, next) => {
         let username = !req.body.username ? req.body.email: req.body.username;
         let password = req.body.password;
         let userCollection = db.get().collection('users');
+        console.log(username, 'username');
         userCollection.findOne(
             { email: username }, 
             (err, user) => {
                 if (err) {
                     json_error.DefaultError(err, res);
                 }
+                console.log(user, 'user');
                 if (user) {
-                    return res.status(400).json("User already exists!");
+                    return res.status(400).json({message: "User already exists!"});
                 }
                 bcrypt.hash(password, parseInt(process.env.SALT_ROUNDS), (err, hash) => {
                         if (err) 
@@ -221,8 +223,7 @@ const logout = async (req, res, next) => {
                         var cookies = new Cookies(req, res, { keys: keys })
                         cookies.set('jwt-token', '', { signed: true })
                         return res.json({message: "success"});
-                    }else{
-                        console.log(updated);
+                    } else {
                         return res.status(401).json(json_error.NotAuthorized());
                     }
                 })
