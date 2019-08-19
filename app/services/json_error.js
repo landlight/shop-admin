@@ -1,7 +1,21 @@
-function NotFound(item) {
+function IsRequired(item) {
     return {
         code : 400,
         error: `${item} is required`
+    }
+}
+
+function NotFound(item) {
+    return {
+        code : 400,
+        error: `${item} not found`
+    }
+}
+
+function Invalidate(){
+    return {
+        code: 401, 
+        error: `username or password is incorrect`
     }
 }
 
@@ -33,10 +47,18 @@ function AtLeast(item, length){
     }
 }
 
+function DefaultError(error, res) {
+    let errMessage = !error.message? error: error.message;
+    return res.status(500).json({message: errMessage});
+}
+
 module.exports = {
+    IsRequired,
+    DefaultError,
     NotFound,
     NotAuthorized,
     IsNotObject,
     OutOfBound,
-    AtLeast
+    AtLeast,
+    Invalidate
 }
