@@ -20,15 +20,35 @@ const createCategory = async (req, res, next) => {
         category.description = req.body.description;
         category._id = new ObjectId;
         category = stamperService.stamp(category);
-        if (req.body.parentId){   
-            category.parent_id = ObjectId(req.body.parentId); 
+        let promises = [];
+        if (req.body.parentId) {   
+            promises.push(new Promise((resolve, reject) => {
+                categoryCollection.findOne({
+                    _id: ObjectId(req.body.parentId)
+                }, (err, parentCategory) => {
+                    if (err) {
+                        return reject(err);
+                    }
+                    if (!parentCategory) {
+                        return reject('parentId not found');
+                    }
+                    return resolve(parentCategory._id);
+                })
+            }))
         }
-        categoryCollection.insertOne(category, 
-            (err, insertedCategory) => {
-            if (err) {
-                json_error.DefaultError(err, res);
+        Promise.all(promises).then((results) => {
+            if (results.length > 0) {
+                category.parent_id = results[0];
             }
-            return res.json(pagingService.camelCase(insertedCategory.ops[0]));
+            categoryCollection.insertOne(category, 
+                (err, insertedCategory) => {
+                if (err) {
+                    json_error.DefaultError(err, res);
+                }
+                return res.json(pagingService.camelCase(insertedCategory.ops[0]));
+            })
+        }, (err) => {
+            json_error.DefaultError(err, res);
         })
     } catch (err) {
         json_error.DefaultError(err, res);
