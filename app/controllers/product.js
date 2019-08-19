@@ -4,6 +4,7 @@ const json_error = require('../services/json_error');
 const Product = require('../models/product');
 const pagingService = require('../services/paging');
 const stamperService = require('../services/stamper');
+const productService = require('../services/product');
 
 const createProduct = async (req, res, next) => {
     try {
@@ -79,8 +80,44 @@ const getProduct = async (req, res, next) => {
                 }
                 return res.json(pagingService.camelCase(product));
             })        
-        
+    } catch (err) {
+        json_error.DefaultError(err, res);
+    }
+}
 
+const addProductTag = async (req, res, next) => {
+    try {
+        if (!req.params.productId) {
+            return res.status(400).json(json_error.IsRequired('productId'));
+        }
+        if (!req.body.tag) {
+            return res.status(400).json(json_error.IsRequired('tag'));
+        }
+        let addPromise = productService.manageProductTag(req.params.productId, req.body.tag, true);
+        addPromise.then((result) => {
+            return res.json({message: result});
+        }, (err) => {
+            json_error.DefaultError(err, res);
+        })
+    } catch (err) {
+        json_error.DefaultError(err, res);
+    }
+}
+
+const deleteProductTag = async (req, res, next) => {
+    try {
+        if (!req.params.productId) {
+            return res.status(400).json(json_error.IsRequired('productId'));
+        }
+        if (!req.body.tag) {
+            return res.status(400).json(json_error.IsRequired('tag'));
+        }
+        let deletePromise = productService.manageProductTag(req.params.productId, req.body.tag, false);
+        deletePromise.then((result) => {
+            return res.json({message: result});
+        }, (err) => {
+            json_error.DefaultError(err, res);      
+        })
     } catch (err) {
         json_error.DefaultError(err, res);
     }
@@ -89,5 +126,7 @@ const getProduct = async (req, res, next) => {
 module.exports = {
     createProduct,
     getProducts,
-    getProduct
+    getProduct,
+    addProductTag,
+    deleteProductTag
 }
