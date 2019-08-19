@@ -23,16 +23,39 @@ const createProduct = async (req, res, next) => {
         product.description = req.body.description;
         product.price = parseInt(req.body.price);
         product.priceType = req.body.priceType; // need to refactor;
-        product._id = new ObjectId;
+        product._id = new ObjectId();
         product = stamperService.stamp(product);
-        
-        productCollection.insertOne(product, 
-            (err, insertedProduct) => {
-            if (err) {
-                json_error.DefaultError(err, res);
+        let promises = [];
+        if (req.body.categoryId) {
+            let categoryCollection = db.get().collection('categories');
+            promises.push(new Promise((resolve, reject) => {
+                categoryCollection.findOne(
+                    {_id: ObjectId(req.body.categoryId)}, 
+                    (err, category) => {
+                        if (err) {
+                            return reject(err);
+                        }
+                        if (!category) {
+                            return reject('Category not found');
+                        }
+                        return resolve(category._id);
+                    })
+            }))
+        }
+        Promise.all(promises).then((result) => {
+            if (result.length > 0) {
+                product.category_id = result[0];
             }
-            return res.json(pagingService.camelCase(insertedProduct.ops[0]));
-        })
+            productCollection.insertOne(product, 
+                (err, insertedProduct) => {
+                if (err) {
+                    json_error.DefaultError(err, res);
+                }
+                return res.json(pagingService.camelCase(insertedProduct.ops[0]));
+            })
+        }, (err) => {
+            json_error.DefaultError(err, res);
+        });
     } catch (err) {
         json_error.DefaultError(err, res);
     }
@@ -123,10 +146,75 @@ const deleteProductTag = async (req, res, next) => {
     }
 }
 
+const updateProductCategory = async (req, res, next) => {
+    try {
+        if (!req.params.productId) {
+            return res.status(400).json(json_error.IsRequired('productId'));
+        }
+        if (!req.body.categoryId) {
+            return res.status(400).json(json_error.IsRequired('categoryId'));
+        }
+        let categoryCollection = db.get().collection('categories');
+        categoryCollection.findOne(
+            {_id: ObjectId(req.body.categoryId)}
+            , (err, category) => {
+                if (err) {
+                    json_error.DefaultError(err, res);
+                }
+                if (!category) {
+                    return res.status(400).json('Category not found');
+                }
+                let productCollection = db.get().collection('products');
+                productCollection.updateOne(
+                    {_id: ObjectId(req.params.productId)}, 
+                    {$set: {category_id: category._id}}, 
+                    {upsert: false}, 
+                    (err, updated) => {
+                        if (err) {
+                            json_error.DefaultError(err, res);
+                        }
+                        if (updated.modifiedCount != 1) {
+                            return res.status(400).json({message: 'categoryId not updated'});
+                        }
+                        return res.json({message: "success"});
+                    })
+            })
+    } catch (err) {
+        json_error.DefaultError(err, res);
+    }
+}
+
+const deleteProductCategory = async (req, res, next) => {
+    try {
+        if (!req.params.productId) {
+            return res.status(400).json(json_error.IsRequired('productId'));
+        }
+        let productCollection = db.get().collection('products');
+        productCollection.updateOne(
+            {_id: ObjectId(req.params.productId)},
+            {$set: {category_id: ''}},
+            {upsert: false},
+            (err, updated) => {
+                if (err) {
+                    json_error.DefaultError(err, res);
+                }
+                if (updated.modifiedCount != 1) {
+                    return res.status(400).json({message: "Removing category failed"})
+                }
+                return res.json({message: "success"});
+            }
+        )
+    } catch (err) {
+        json_error.DefaultError(err, res);
+    }
+}
+
 module.exports = {
     createProduct,
     getProducts,
     getProduct,
     addProductTag,
-    deleteProductTag
+    deleteProductTag,
+    updateProductCategory,
+    deleteProductCategory
 }

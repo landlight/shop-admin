@@ -12,6 +12,12 @@ productRouter.route('/:productId/tag')
 productRouter.route('/:productId/tag')
     .delete(productController.deleteProductTag);
 
+productRouter.route('/:productId/category')
+    .post(productController.updateProductCategory);
+
+productRouter.route('/:productId/category')
+    .delete(productController.deleteProductCategory);
+
 productRouter.route('/')
     .get(productController.getProducts);
 

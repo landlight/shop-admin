@@ -18,7 +18,7 @@ const createCategory = async (req, res, next) => {
         } 
         category.name = req.body.name;
         category.description = req.body.description;
-        category._id = new ObjectId;
+        category._id = new ObjectId();
         category = stamperService.stamp(category);
         let promises = [];
         if (req.body.parentId) {   
@@ -93,7 +93,7 @@ const getCategory = async (req, res, next) => {
                     json_error.DefaultError(err, res);
                 }
                 if (!category) {
-                    return res.status(400).json(json_error.IsRequired('Category'));            
+                    return res.status(400).json(json_error.NotFound('Category'));            
                 }
                 return res.json(pagingService.camelCase(category));
             })        
@@ -101,7 +101,6 @@ const getCategory = async (req, res, next) => {
         json_error.DefaultError(err, res);
     }
 }
-
 
 module.exports = {
     getCategories,
