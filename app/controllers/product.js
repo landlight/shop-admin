@@ -3,6 +3,7 @@ const ObjectId = require('mongodb').ObjectID;
 const json_error = require('../services/json_error');
 const Product = require('../models/product');
 const pagingService = require('../services/paging');
+const stamperService = require('../services/stamper');
 
 const createProduct = async (req, res, next) => {
     try {
@@ -22,13 +23,14 @@ const createProduct = async (req, res, next) => {
         product.price = parseInt(req.body.price);
         product.priceType = req.body.priceType; // need to refactor;
         product._id = new ObjectId;
-
+        product = stamperService.stamp(product);
+        
         productCollection.insertOne(product, 
             (err, insertedProduct) => {
             if (err) {
                 json_error.DefaultError(err, res);
             }
-            return res.json(pagingService.camelCase(product));
+            return res.json(pagingService.camelCase(insertedProduct.ops[0]));
         })
     } catch (err) {
         json_error.DefaultError(err, res);
@@ -62,7 +64,7 @@ const getProducts = async (req, res, next) => {
 
 const getProduct = async (req, res, next) => {
     try {
-        if (req.params.userId) {
+        if (!req.params.productId) {
             return res.status(400).json(json_error.IsRequired('productId'));
         }
         let productCollection = db.get().collection('products');
@@ -71,6 +73,9 @@ const getProduct = async (req, res, next) => {
             (err, product) => {
                 if (err) {
                     json_error.DefaultError(err, res);
+                }
+                if (!product) {
+                    return res.status(400).json(json_error.NotFound('Product'));
                 }
                 return res.json(pagingService.camelCase(product));
             })        

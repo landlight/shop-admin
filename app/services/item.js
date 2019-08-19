@@ -1,4 +1,4 @@
-var json_error = require('../services/json_error');
+var json_error = require('./json_error');
 var ObjectId = require('mongodb').ObjectID;
 
 const checkAddRequest = (req, res) => {

@@ -32,7 +32,7 @@ const getUsers = async (req, res, next) => {
 
 const getUser = async (req, res, next) => {
     try {
-        if (req.params.userId) {
+        if (!req.params.userId) {
             return res.status(400).json(json_error.IsRequired('userId'));
         }
         let userCollection = db.get().collection('users');
@@ -41,6 +41,9 @@ const getUser = async (req, res, next) => {
             (err, user) => {
                 if (err) {
                     json_error.DefaultError(err, res);
+                }
+                if (!user) {
+                    return res.status(400).json(json_error.NotFound('User'));
                 }
                 return res.json(pagingService.camelCase(user));
             })        

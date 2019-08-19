@@ -1,12 +1,15 @@
-// var categoryController = require('../controllers/categoryController')
+var categoryController = require('../controllers/category')
 
 var express = require('express');
 var categoryRouter = express.Router();
 
-// categoryRouter.route('/')
-//     .post(categoryController.add);
+categoryRouter.route('/:categoryId')
+    .get(categoryController.getCategory);
 
-// categoryRouter.route('/')
-//     .get(categoryController.get);
+categoryRouter.route('/')
+    .post(categoryController.createCategory);
+
+categoryRouter.route('/')
+    .get(categoryController.getCategories);
 
 module.exports = categoryRouter;
