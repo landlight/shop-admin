@@ -30,7 +30,7 @@ db.connect(process.env.DB_HOST, process.env.DB_NAME, function (err) {
 })
 
 // Send message for default URL
-app.get('/', (req, res) => res.send('Hello World with Admin_API_Nodejs'));
+app.get('/', (req, res) => res.send('Hello World with Shop Admin'));
 // Use Api routes in the App
 
 let routes = require('./app/routes/routes');
@@ -39,7 +39,7 @@ app.use(basepath, routes);
 
 // Launch app to listen to specified port
 var server = app.listen(port, function () {
-  console.log("Running Zon on port " + port);
+  console.log("Running Shop Admin on port " + port);
 });
 
 module.exports = server;

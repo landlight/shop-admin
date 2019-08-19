@@ -1,4 +1,5 @@
 const db = require('../../database');
+const ObjectId = require('mongodb').ObjectID;
 const bcrypt = require('bcrypt');
 const json_error = require('../services/json_error');
 const stamperService = require('../services/stamper');
@@ -201,25 +202,27 @@ const logout = async (req, res, next) => {
             const bearHeader = req.headers['authorization'];
             jwt_token = bearHeader.split(' ')[1]; 
         }
+        console.log(jwt_token, "token");
         if (jwt_token == '') {
             return res.status(401).json(json_error.NotAuthorized());
         }
         jwt.verify(jwt_token, process.env.JWT_SECRET, (err, authData) => {
             if (err) {
                 return res.status(401).json(json_error.NotAuthorized());
-            }else{
-                let collection = db.get().collection("refreshtokens")
+            } else {
+                let collection = db.get().collection("refresh_tokens")
                 collection.updateOne(
                     {_id: ObjectId(authData.refresh_token_id)},
                     {$set: {deleted_at: new Date()}
                 }, (err, updated) => {
                     if (err)
                         return next(err);
-                    if (updated.modifiedCount > 0){
+                    if (updated.modifiedCount == 1) {
                         var cookies = new Cookies(req, res, { keys: keys })
                         cookies.set('jwt-token', '', { signed: true })
                         return res.json({message: "success"});
                     }else{
+                        console.log(updated);
                         return res.status(401).json(json_error.NotAuthorized());
                     }
                 })
@@ -236,7 +239,6 @@ function generateJWT(tokenId, userId, role) {
         user_id: userId,
         roles: role
     }
-    console.log(process.env.TOKEN_LIFE);
     return jwt.sign(payload
         , process.env.JWT_SECRET, {
             algorithm: `${process.env.ALGORITHM}`,

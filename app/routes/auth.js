@@ -10,6 +10,6 @@ authRouter.route('/login')
           .post(authController.login);
 
 authRouter.route('/logout')
-          .get(authController.logout);
+          .delete(authController.logout);
 
 module.exports = authRouter;
