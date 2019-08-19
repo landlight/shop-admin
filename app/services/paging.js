@@ -1,28 +1,46 @@
-const camelcaseKeys = require('camelcase-keys');
+var camel = require('./camel');
 
-function getPageSize(req){
+function getPageSize(req) {
     let pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : parseInt(process.env.PAGE_SIZE);
     return {
         pageSize
     };
 }
 
-function pageResponse(pageSize, results, nextPageId) {
-    items = []
-    for(let i in results){
-        items.push(results[i].toObject());
-    }
+function pageResponse(pageNo, pageSize, result) {
     return {
         pageInformation: {
+            page: pageNo,
             size: pageSize,
-            numberOfItems: results.length,
-            nextPageId
+            numberOfItems: result.length,
         },
-        entities: camelcaseKeys(items)
+        entities: camel.camelCaseObject(result)
     };
+}
+
+function getSkipValue(pageNo, pageSize) {
+    if (pageNo == 0 || pageNo == 1) {
+        return 0;
+    } else {
+        return (pageNo - 1) * pageSize;
+    }
+}
+
+function initializePaging(pageNo, pageSize) {
+    return {
+        pageNo: !pageNo ? 1: parseInt(pageNo),
+        pageSize: !pageSize ? 10: parseInt(pageSize),
+    }
+}
+
+function camelCase(items){
+    return camel.camelCaseObject(items);
 }
 
 module.exports = {
     getPageSize,
-    pageResponse
+    pageResponse,
+    camelCase,
+    initializePaging,
+    getSkipValue
 }
