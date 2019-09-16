@@ -6,6 +6,12 @@ var categoryRouter = express.Router();
 categoryRouter.route('/:categoryId')
     .get(categoryController.getCategory);
 
+categoryRouter.route('/:categoryId')
+    .put(categoryController.updateCategory);
+
+categoryRouter.route('/:categoryId')
+    .delete(categoryController.deleteCategory);
+
 categoryRouter.route('/')
     .post(categoryController.createCategory);
 
