@@ -102,8 +102,58 @@ const getCategory = async (req, res, next) => {
     }
 }
 
+const updateCategory = async (req, res, next) => {
+    try {
+        if (!req.params.categoryId) {
+            return res.status(400).json(json_error.IsRequired('categoryId'));
+        }
+        if (!req.body.name) {
+            return res.status(400).json(json_error.IsRequired('name'));
+        } 
+        if (!req.body.description) {
+            return res.status(400).json(json_error.IsRequired('description'));
+        } 
+        let categoryCollection = db.get().collection('categories');
+        categoryCollection.findOne({_id: ObjectId(req.params.categoryId)}, (err, category) => {
+            if (err) {
+                json_error.DefaultError(err, res); 
+            }
+            if (!category) {
+                return res.status(400).json(json_error.NotFound('Category'));
+            }
+            let updateQuery = {
+                $set: {
+                    name: req.body.name,
+                    description: req.body.description,
+                    updated_at: new Date()
+                }
+            };
+            if (req.body.parentId) {
+                updateQuery.$set.parent_id = ObjectId(req.body.parentId);
+            }
+            categoryCollection.updateOne(
+                { _id: ObjectId(req.params.categoryId)},
+                updateQuery,
+                { upsert: false }, 
+                (err, updated) => {
+                    if (err) {
+                        json_error.DefaultError(err, res);
+                    }
+                    if (updated.modifiedCount < 1) {
+                        return res.status(400).json({message: "Error occurred while updating category"});
+                    }
+                    return res.json({message: "success"});        
+                }
+            )
+        })
+    } catch (err) {
+        json_error.DefaultError(err, res);
+    }
+}
+
 module.exports = {
     getCategories,
     getCategory,
-    createCategory
+    createCategory,
+    updateCategory
 }
