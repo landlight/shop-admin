@@ -151,9 +151,43 @@ const updateCategory = async (req, res, next) => {
     }
 }
 
+const deleteCategory = async (req, res, next) => {
+    try {
+        if (!req.params.categoryId) {
+            return res.status(400).json(json_error.IsRequired('categoryId'));
+        }
+        let categoryCollection = db.get().collection('categories');
+        categoryCollection.findOne({_id: ObjectId(req.params.categoryId)}, (err, category) => {
+            if (err) {
+                json_error.DefaultError(err, res);
+            }
+            if (!category) {
+                return res.status(400).json(json_error.NotFound('Category'));
+            }
+            categoryCollection.updateOne(
+                { _id: ObjectId(req.params.categoryId) },
+                { $set: {deleted_at: new Date()} },
+                { upsert: false },
+                (err, updated) => {
+                    if (err) {
+                        json_error.DefaultError(err, res);
+                    }
+                    if (updated.modifiedCount < 1) {
+                        return res.status(400).json({message: "Error occured while deleting category"});
+                    }
+                    return res.json({message: "success"});
+                }
+            )
+        })
+    } catch (err) {
+        json_error.DefaultError(err, res);
+    }
+}
+
 module.exports = {
     getCategories,
     getCategory,
     createCategory,
-    updateCategory
+    updateCategory,
+    deleteCategory
 }

@@ -9,6 +9,9 @@ categoryRouter.route('/:categoryId')
 categoryRouter.route('/:categoryId')
     .put(categoryController.updateCategory);
 
+categoryRouter.route('/:categoryId')
+    .delete(categoryController.deleteCategory);
+
 categoryRouter.route('/')
     .post(categoryController.createCategory);
 
